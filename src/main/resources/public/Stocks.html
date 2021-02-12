@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Table V05</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script>
+<!--===============================================================================================-->	
+	<link rel="icon" type="image/png" href="images/icons/favicon.ico"/>
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="vendor/bootstrap/css/bootstrap.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="vendor/animate/animate.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="vendor/select2/select2.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="vendor/perfect-scrollbar/perfect-scrollbar.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="css/util.css">
+	<link rel="stylesheet" type="text/css" href="css/main.css">
+<!--===============================================================================================-->
+</head>
+<body>
+	
+	<div class="limiter">
+		<div class="container-table100">
+			<div class="wrap-table100">
+				<div class="table100 ver1">
+					<table>
+						<tbody>
+						</tbody>
+					</table>
+					
+					<table >
+						<thead>
+							<tr class="row100 head">
+								<th class="cell100 column2">Stock Symbol</th>
+								<th class="cell100 column3">Price</th>
+							</tr>
+						</thead>
+						<tbody id = "ModuleUserTable">
+							<tr > </tr>
+						</tbody>
+					</table>
+				</div>
+				<div id="content"></div>  
+			</div>
+		</div>
+	</div>
+
+
+<!--===============================================================================================-->	
+	<script src="vendor/jquery/jquery-3.2.1.min.js"></script>
+<!--===============================================================================================-->
+	<script src="vendor/bootstrap/js/popper.js"></script>
+	<script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+<!--===============================================================================================-->
+	<script src="vendor/select2/select2.min.js"></script>
+<!--===============================================================================================-->
+	<script src="vendor/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+	
+<script id="user-template" type="text/template">
+{{#people}}
+<tr>
+    <td>{{FullName}}</td>
+    <td>{{WorkEmail}}</td>
+</tr>
+{{/people}}
+</script>
+
+<script id="stock-template" type="text/template">
+{{#.}}
+<tr class="row100 head">
+    <td class="cell100 column2">{{symbol}}</td>
+    <td class="cell100 column3">{{price}}</td>
+</tr>
+{{/.}}
+</script>
+
+<script>
+var text = '[{"Fullname":"John", "WorkEmail":"john@gmail.com"},{"Fullname":"Mary", "WorkEmail":"mary@gmail.com"}]'
+var obj = {people: JSON.parse(text)};
+
+ $(function() { 
+
+	console.log("Hasan 1");
+	$.getJSON('http://localhost:8082/stock', function(data) {
+			console.log("Hasan 2");
+			var template = $("#stock-template").html();
+		//	var text = Mustache.render(template, data);
+		//	$('#ModuleUserTable').html(text);
+	});
+        
+}); 
+	
+$(document).ready(function() {
+    var template = $('#user-template').html();
+	var info = Mustache.render(template, obj);
+    
+	$.getJSON('http://localhost:8082/stock', function(data) {
+			var template = $("#stock-template").html();
+			var text = Mustache.render(template, data);
+			$('#ModuleUserTable').html(text);
+	});
+	
+	$.ajax({
+		type : 'POST',
+		url : 'http://localhost:8082/sign-in',
+		contentType:'application/json',
+		crossDomain: true,
+		headers: {
+			'Access-Control-Allow-Origin': '*'
+		},
+		dataType: 'jsonp',
+		data : {
+			email : 'a@gmail.com',
+			password : 'asdasds',
+		},
+		success : function(data) {
+			console.log("Hello world!");
+		},
+		error : function(jqXHR, textStatus, errorThrown) {
+			console.log("Hello ");
+		}
+	});
+   
+   $.ajax({
+		type : 'GET',
+		url : 'http://localhost:8082/stock',
+		crossDomain: true,
+		headers: {"Origin": "www.facebook.com.tr"},
+		headers: {
+			'Access-Control-Allow-Origin': '*'
+		},
+		dataType: 'jsonp',
+		contentType:'application/json',
+		
+		success : function(data) {
+			console.log("Hello world!");
+		},
+		error : function(jqXHR, textStatus, errorThrown) {
+			console.log("Hello ");
+		}
+	});
+});
+</script>
+
+<script>
+	$('.js-pscroll').each(function(){
+		var ps = new PerfectScrollbar(this);
+
+		$(window).on('resize', function(){
+			ps.update();
+		})
+
+		$(this).on('ps-x-reach-start', function(){
+			$(this).parent().find('.table100-firstcol').removeClass('shadow-table100-firstcol');
+		});
+
+		$(this).on('ps-scroll-x', function(){
+			$(this).parent().find('.table100-firstcol').addClass('shadow-table100-firstcol');
+		});
+
+	});
+</script>
+
+<!--===============================================================================================-->
+	<script src="js/main.js"></script>
+
+</body>
+</html>
