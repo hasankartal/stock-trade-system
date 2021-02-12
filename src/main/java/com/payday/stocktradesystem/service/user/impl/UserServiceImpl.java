@@ -13,10 +13,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.transaction.Transactional;
-import java.net.URI;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +22,6 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final ConfirmationTokenService confirmationTokenService;
-    private final EmailSenderService emailSenderService;
 
     @Override
     public User findByEmailIdIgnoreCase(String email) {
@@ -48,41 +45,27 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public ResponseEntity<Object> register(UserDto userDto) {
+    public String register(UserDto userDto) {
         User user = new User();
         user.setEmail(userDto.getEmail());
         user.setPassword(userDto.getPassword());
         user.setUserName(userDto.getUserName());
         user.setEnabled(false);
 
-        User savedUser;
         try{
-            savedUser = userRepository.save(user);
+            userRepository.save(user);
 
             ConfirmationToken confirmationToken = new ConfirmationToken(user);
             confirmationTokenService.save(confirmationToken);
 
-            SimpleMailMessage mailMessage = new SimpleMailMessage();
-            mailMessage.setTo(userDto.getEmail());
-            mailMessage.setSubject("Complete Registration!");
-            mailMessage.setFrom("hasankartal18@gmail.com");
-            mailMessage.setText("To confirm your account, please click here : "
-                    +"http://localhost:8082/confirm-account?token="+confirmationToken.getConfirmationToken());
-
-            emailSenderService.sendEmail(mailMessage);
+            return confirmationToken.getConfirmationToken();
         } catch (DataIntegrityViolationException ex) {
             throw new DataIntegrityViolationDbException("Could not register in db");
         } catch (Exception ex) {
             //TODO Mail Exception
-            throw new DataIntegrityViolationDbException("Could not register in db");
+            throw new DataIntegrityViolationDbException("Could not send email");
         }
 
-        //TODO Location will be removed
-        URI location =
-                ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                        .buildAndExpand(savedUser.getUserId())
-                        .toUri();
 
-        return ResponseEntity.created(location).build();
     }
 }

@@ -7,7 +7,6 @@ import com.payday.stocktradesystem.model.account.AccountDto;
 import com.payday.stocktradesystem.model.stock.Stock;
 import com.payday.stocktradesystem.model.stock.StockList;
 import com.payday.stocktradesystem.model.stock.StockPrice;
-import com.payday.stocktradesystem.model.stock.StockResponseDto;
 import com.payday.stocktradesystem.service.account.AccountService;
 import com.payday.stocktradesystem.service.email.EmailSenderService;
 import com.payday.stocktradesystem.service.orderstock.OrderstockService;
@@ -25,6 +24,7 @@ import org.springframework.web.client.RestTemplate;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -46,15 +46,6 @@ public class StockManagementService {
     @Autowired
     private RestTemplate restTemplate;
 
-    public StockList findAllStock() {
-        String url = "https://api.twelvedata.com/stocks";
-        //String aaplUrl = "https://api.twelvedata.com/stocks?symbol=AAPL&source=docs";
-
-        ResponseEntity<StockList> result = restTemplate.getForEntity(url, StockList.class);
-        StockList stockList = result.getBody();
-
-        return stockList;
-    }
 
     @Cacheable(value="cacheShareByCountry")
     public StockList findShareByCountry(String country) {
@@ -74,7 +65,75 @@ public class StockManagementService {
         return stockPrice;
     }
 
-    @Async("taskExecutor2")
+    public void getPricesBySymbolEvent(Stock stock) {
+        StockPrice price = stockPrice(stock.getSymbol());
+        Random rand = new Random();
+        int randomPrice = rand.nextInt(1000);
+        BigDecimal priceDecimal = new BigDecimal(price != null && price.getPrice() != null ? price.getPrice() : String.valueOf(randomPrice));
+
+        buyShare(priceDecimal, stock);
+        sellShare(priceDecimal, stock);
+    }
+
+    /*
+     * E.g. buy 100 TSLA shares with target price 200$. The order should be filled  when the price is equal or under 200$
+     */
+    public void buyShare(BigDecimal priceDecimal, Stock stock) {
+        List<Orderstock> orderstockBuyList = orderstockService.buyStock(stock.getSymbol(), Utils.BUY, priceDecimal);
+        for (Orderstock orderstock : orderstockBuyList) {
+            AccountDto accountDto = new AccountDto();
+            BigDecimal stockLot = new BigDecimal(orderstock.getStockLot());
+            BigDecimal cash = stockLot.multiply(priceDecimal);
+            accountDto.setCash(cash);
+
+            User existingUser = userService.findByUserId(orderstock.getUser().getUserId());
+            if (existingUser == null || Boolean.FALSE.equals(existingUser.isEnabled() )) {
+                throw new DataIntegrityViolationDbException("Could not find active user!");
+            }
+
+            try {
+               accountService.withdrawCash(accountDto, existingUser);
+               orderstock.setActive(false);
+               orderstockService.updateOrderstock(orderstock);
+
+                SimpleMailMessage simpleMailMessage = Utils.sendEmail(existingUser.getEmail(), "STOCK SELL NOTIFICATION",
+                        "paydataassignment@gmail.com","Stock Symbol -> " + stock.getSymbol() + "/n"
+                                + " Stock Price -> " + priceDecimal);
+                emailSenderService.sendEmail(simpleMailMessage);
+            } catch (Exception ex) {
+            }
+        }
+    }
+
+    /*
+     * Sell share for 200$, the  order will be filled when the TSLA price is equal or  more than 200$.
+     */
+    public void sellShare(BigDecimal priceDecimal, Stock stock) {
+        List<Orderstock> orderstockSellList = orderstockService.sellStock(stock.getSymbol(), Utils.SELL, priceDecimal);
+        for (Orderstock orderstock : orderstockSellList) {
+            AccountDto accountDto = new AccountDto();
+            BigDecimal stockLot = new BigDecimal(orderstock.getStockLot());
+            BigDecimal cash = stockLot.multiply(priceDecimal);
+            accountDto.setCash(cash);
+
+            User existingUser = userService.findByUserId(orderstock.getUser().getUserId());
+            if (existingUser == null || Boolean.FALSE.equals(existingUser.isEnabled() )) {
+                throw new DataIntegrityViolationDbException("Could not find active user!");
+            }
+
+            accountService.loadCash(accountDto, existingUser);
+            orderstock.setActive(false);
+            orderstockService.updateOrderstock(orderstock);
+
+            SimpleMailMessage simpleMailMessage = Utils.sendEmail(existingUser.getEmail(), "STOCK BUY NOTIFICATION",
+                    "paydataassignment@gmail.com","Stock Symbol -> " + stock.getSymbol() + "/n"
+                            + " Stock Price -> " + priceDecimal);
+            emailSenderService.sendEmail(simpleMailMessage);
+        }
+    }
+
+    //In order to performance, prices should be get asynchronously.
+    @Async("taskExecutor")
     public CompletableFuture<List<Stock>> getPricesBySymbol(List<Stock> stockList) {
         List<Stock> stockList1 = new ArrayList<Stock>();
         for (Stock stock: stockList) {
@@ -88,94 +147,4 @@ public class StockManagementService {
         return CompletableFuture.completedFuture(stockList1);
     }
 
-    @Async("taskExecutor2")
-    public CompletableFuture<StockResponseDto> getPricesByStock(Stock stock) {
-        StockResponseDto stockResponseDto = new StockResponseDto();
-        StockPrice price = stockPrice(stock.getSymbol());
-        stockResponseDto.setPrice(price.getPrice());
-        stockResponseDto.setSymbol(stock.getSymbol());
-
-        return CompletableFuture.completedFuture(stockResponseDto);
-    }
-
-    @Async("taskExecutor")
-    public void getPricesBySymbolEvent(List<Stock> stockList) {
-        for (Stock stock: stockList) {
-            StockPrice price = stockPrice(stock.getSymbol());
-
-       //     List<Orderstock> orderstockList = orderstockRepository.findByStackSymbolEquals(stock.getSymbol());
-         //   for (Orderstock orderstock : orderstockList)
-           //     System.out.println(orderstock.getCash() + " - " + orderstock.getStackSymbol() + "-" + orderstock.getStackLot());
-            System.out.println("Thread " + Thread.currentThread().getName() + stock.getSymbol());
-        }
-    }
-
-   // @Async("taskExecutor")
-    public void getPricesBySymbolEvent(Stock stock) {
-        StockPrice price = stockPrice(stock.getSymbol());
-        BigDecimal priceDecimal = new BigDecimal(price != null && price.getPrice() != null ? price.getPrice() : "100");
-
-        buyShare(priceDecimal, stock);
-        sellShare(priceDecimal, stock);
-    }
-
-    /*
-     * E.g. buy 100 TSLA shares with target price 200$. The order should be filled  when the price is equal or under 200$
-     */
-    public void buyShare(BigDecimal priceDecimal, Stock stock) {
-        List<Orderstock> orderstockBuyList = orderstockService.buyStock(stock.getSymbol(), Utils.BUY, priceDecimal);
-        for (Orderstock orderstock : orderstockBuyList) {
-            AccountDto accountDto = new AccountDto();
-            BigDecimal cash = orderstock.getCash().multiply(priceDecimal);
-            accountDto.setCash(cash);
-
-            User existingUser = userService.findByUserId(orderstock.getUser().getUserId());
-            if (existingUser == null || Boolean.FALSE.equals(existingUser.isEnabled() )) {
-                throw new DataIntegrityViolationDbException("Could not find active user!");
-            }
-            accountService.withdrawCash(accountDto, existingUser);
-            orderstock.setActive(false);
-            orderstockService.updateOrderstock(orderstock);
-
-            SimpleMailMessage simpleMailMessage = Utils.sendEmail(existingUser.getEmail(), "STOCK SELL NOTIFICATION",
-                    "paydataassignment@gmail.com","Stock Symbol -> " + stock.getSymbol() + "/n"
-                            + " Stock Price -> " + priceDecimal);
-            emailSenderService.sendEmail(simpleMailMessage);
-        }
-    }
-
-    /*
-     * Sell share for 200$, the  order will be filled when the TSLA price is equal or  more than 200$.
-     */
-    public void sellShare(BigDecimal priceDecimal, Stock stock) {
-        List<Orderstock> orderstockSellList = orderstockService.sellStock(stock.getSymbol(), Utils.SELL, priceDecimal);
-        for (Orderstock orderstock : orderstockSellList) {
-            AccountDto accountDto = new AccountDto();
-            BigDecimal stackLot = new BigDecimal(orderstock.getStackLot());
-            BigDecimal cash = stackLot.multiply(priceDecimal);
-            accountDto.setCash(cash);
-
-            User existingUser = userService.findByUserId(orderstock.getUser().getUserId());
-            if (existingUser == null || Boolean.FALSE.equals(existingUser.isEnabled() )) {
-                throw new DataIntegrityViolationDbException("Could not find active user!");
-            }
-            accountService.loadCash(accountDto, existingUser);
-            orderstock.setActive(false);
-            orderstockService.updateOrderstock(orderstock);
-
-            SimpleMailMessage simpleMailMessage = Utils.sendEmail(existingUser.getEmail(), "STOCK BUY NOTIFICATION",
-                    "paydataassignment@gmail.com","Stock Symbol -> " + stock.getSymbol() + "/n"
-                            + " Stock Price -> " + priceDecimal);
-            emailSenderService.sendEmail(simpleMailMessage);
-        }
-    }
-
-    @Async("taskExecutor")
-    public CompletableFuture<StockList> getCountriesByRegion(String country) {
-        String url = "https://api.twelvedata.com/stocks?country=" + country;
-        ResponseEntity<StockList> result = restTemplate.getForEntity(url, StockList.class);
-        StockList stockList = result.getBody();
-
-        return CompletableFuture.completedFuture(stockList);
-    }
 }

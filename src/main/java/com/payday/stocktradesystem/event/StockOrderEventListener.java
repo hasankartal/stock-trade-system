@@ -17,18 +17,6 @@ public class StockOrderEventListener {
     @Autowired
     StockManagementService stockManagementService;
 
-   // @EventListener(ApplicationReadyEvent.class)
-   // public void stockOrderEventListener() throws InterruptedException {
-      /*  StockList stockListApi = stockTwelveService.findStockByCountry("Turkey");
-        List<List<Stock>> stockLists =  Lists.partition(stockListApi.getData(), 10);
-        List<Stock> firstPartList = stockLists.get(0);
-        while(true) {
-            for (Stock stock : firstPartList) {
-                stockTwelveService.getPricesBySymbolEvent(stock);
-            }
-        }*/
-  //  }
-
     @EventListener(ApplicationReadyEvent.class)
     public void stockOrderEventListener() throws InterruptedException {
         StockList stockListApi = stockManagementService.findShareByCountry("Turkey");
@@ -37,7 +25,7 @@ public class StockOrderEventListener {
 
         while(true) {
             for (Stock stock : firstPartList) {
-   //             stockManagementService.getPricesBySymbolEvent(stock);
+                stockManagementService.getPricesBySymbolEvent(stock);
             }
         }
     }

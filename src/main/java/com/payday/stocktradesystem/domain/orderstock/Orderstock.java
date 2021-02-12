@@ -12,13 +12,13 @@ public class Orderstock {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name="orderstock_id")
-    private long ordersId;
+    private long orderstockId;
 
     private BigDecimal cash;
 
-    private String stackSymbol;
+    private String stockSymbol;
 
-    private long stackLot;
+    private long stockLot;
 
     private String orderType;
 

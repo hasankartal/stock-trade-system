@@ -41,7 +41,7 @@ public class AccountService {
         if (existingAccount != null) {
             account.setAccountId(existingAccount.getAccountId());
             BigDecimal money = existingAccount.getCash().subtract(accountDto.getCash());
-            if(money.compareTo(BigDecimal.ZERO) == 1) {
+            if(money.compareTo(BigDecimal.ZERO) == -1) {
                 throw new DataIntegrityViolationDbException("There is not enough money on account");
             }
             account.setCash(money);
@@ -51,5 +51,9 @@ public class AccountService {
         accountRepository.save(account);
 
         return ResponseEntity.ok().build();
+    }
+
+    public Account findByUser(User user) {
+        return accountRepository.findByUser(user);
     }
 }

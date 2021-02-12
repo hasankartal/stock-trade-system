@@ -5,8 +5,8 @@ Use the Java IDE platform.
 
 ## Usage
 It can be found documentation in this address.
-http://localhost:8081/v2/api-docs \
-http://localhost:8081/swagger-ui/index.html
+http://localhost:8082/v2/api-docs \
+http://localhost:8082/swagger-ui/index.html
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
