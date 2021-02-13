@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title> Login Page </title>
+    <style>
+        Body {
+            font-family: Calibri, Helvetica, sans-serif;
+            background-color: pink;
+        }
+        button {
+            background-color: #4CAF50;
+            width: 100%;
+            color: orange;
+            padding: 15px;
+            margin: 10px 0px;
+            border: none;
+            cursor: pointer;
+        }
+        form {
+            border: 3px solid #f1f1f1;
+        }
+        input[type=text], input[type=password] {
+            width: 100%;
+            margin: 8px 0;
+            padding: 12px 20px;
+            display: inline-block;
+            border: 2px solid green;
+            box-sizing: border-box;
+        }
+        button:hover {
+            opacity: 0.7;
+        }
+        .cancelbtn {
+            width: auto;
+            padding: 10px 18px;
+            margin: 10px 5px;
+        }
+
+
+        .container {
+            padding: 25px;
+            background-color: lightblue;
+        }
+    </style>
+</head>
+<body>
+<center> <h1> Login Form </h1> </center>
+<form >
+    <div class="container">
+        <label>Email : </label>
+        <input type="text" placeholder="Enter Email" id="email" required>
+        <label>Password : </label>
+        <input type="password" placeholder="Enter Password" id="password" required>
+        <button type="submit" onclick= "loginFunction()" >Login</button>
+        <div>
+            <button type="submit" onclick= "stocksFunction()" >Stocks</button>
+        </div>
+        <div>
+            <button type="submit" onclick= "placeAnOrder()" >Deposit Cash</button>
+        </div>
+    </div>
+</form>
+<div id="content"></div>
+</body>
+
+
+<script>
+
+    console.log(localStorage.getItem("email"));
+function loginFunction() {
+    var email = document.getElementById("email").value;
+    var password = document.getElementById("password").value;
+
+    $.getJSON('http://localhost:8082/sign-in', { email: email, password:password}).done(function(data) {
+        if (data == true) {
+            localStorage.setItem("email", email);
+            window.location.href = "Stocks.html";
+        } else {
+            template = $("#template").html();
+            $('#content').html(Mustache.to_html(template, data));
+        }
+    });
+}
+
+
+</script>
+</html>
+

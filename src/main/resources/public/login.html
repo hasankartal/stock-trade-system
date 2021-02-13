@@ -59,40 +59,58 @@ button {
         </div>   
     </form> 
  <div id="content"></div>  
-</body> 
- <script id="template" type="text/x-mustache-template">
-   Hello! My name is <strong>{{name}} {{surname}}</strong>.
-  </script>
-  <script type="text/javascript">
-   var template, data;
-   data={
-    name: "Hayden",
-    surname: "Mcguire"
-   };
-   template = $("#template").html();
-   $('#content').html(Mustache.to_html(template, data));
-  </script>
+</body>
+
+<script id="template" type="text/x-mustache-template">
+    Hello! Email or password is wrong. {{.}}
+</script>
+
 <script>
-  
+
 function loginFunction() {
 	var email = document.getElementById("email").value;
 	var password = document.getElementById("password").value;
-	
-	$.ajax({
-		type : 'POST',
-		url : 'http://localhost:8082/sign-in',
-		contentType:'application/json',
-		data : {
-			email : email,
-			password : password,
-		},
-		success : function(data) {
-			console.log("Hello world!");
-		},
-		error : function(jqXHR, textStatus, errorThrown) {
-			console.log("Hello ");
-		}
-	});
+
+    $.getJSON('http://localhost:8082/sign-in', { email: email, password:password}).done(function(data) {
+        if (data == true) {
+            localStorage.setItem("user", email);
+            window.location.href = "Stocks.html";
+        } else {
+            template = $("#template").html();
+            $('#content').html(Mustache.to_html(template, data));
+        }
+    });
+/*
+/*
+    $.post('http://localhost:8082/sign-in', { email: email, password:password},function(data) {
+        var template = $("#stock-template").html();
+        var text = Mustache.render(template, data);
+        $('#ModuleUserTable').html(text);
+    },"json" );
+
+ $.ajax({
+        type : 'GET',
+        url : 'http://localhost:8082/sign-in',
+        data : {
+            email : email,
+            password : password
+        },
+        success : function(data) {
+            console.log("Hello world!");
+        },
+        error : function(jqXHR, textStatus, errorThrown) {
+            console.log("Hello ");
+        }
+    });
+
+  $.getJSON('http://localhost:8082/sign-in', { email: email, password:password}).done(function(data) {
+        var template = $("#stock-template").html();
+        var text = Mustache.render(template, data);
+        $('#ModuleUserTable').html(text);
+    });
+
+
+*/
 }
 
 </script>    

@@ -23,8 +23,21 @@
 	<link rel="stylesheet" type="text/css" href="css/main.css">
 <!--===============================================================================================-->
 </head>
+<style>
+button {
+	background-color: #4CAF50;
+	width: 100%;
+	color: orange;
+	padding: 15px;
+	margin: 10px 0px;
+	border: none;
+	cursor: pointer;
+}
+button:hover {
+	opacity: 0.7;
+}
+</style>
 <body>
-	
 	<div class="limiter">
 		<div class="container-table100">
 			<div class="wrap-table100">
@@ -46,7 +59,13 @@
 						</tbody>
 					</table>
 				</div>
-				<div id="content"></div>  
+				<div id="content"></div>
+				<div>
+					<button type="submit" onclick= "placeAnOrder()" >Place An Order</button>
+				</div>
+				<div>
+					<button type="submit" onclick= "placeAnOrder()" >Deposit Cash</button>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -84,7 +103,11 @@
 var text = '[{"Fullname":"John", "WorkEmail":"john@gmail.com"},{"Fullname":"Mary", "WorkEmail":"mary@gmail.com"}]'
 var obj = {people: JSON.parse(text)};
 
- $(function() { 
+function placeAnOrder() {
+	window.location.href = "placeOrder.html";
+}
+ $(function() {
+	 console.log(localStorage.getItem("user"));
 
 	console.log("Hasan 1");
 	$.getJSON('http://localhost:8082/stock', function(data) {
@@ -105,7 +128,7 @@ $(document).ready(function() {
 			var text = Mustache.render(template, data);
 			$('#ModuleUserTable').html(text);
 	});
-	
+
 	$.ajax({
 		type : 'POST',
 		url : 'http://localhost:8082/sign-in',
