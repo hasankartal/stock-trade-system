@@ -84,7 +84,7 @@ a {
 	<label for="name"><b>Username</b></label>
     <input type="username" placeholder="Enter Username" name="name" id="name" required>
 	
-    <button type="submit" class="registerbtn">Register</button>
+    <button type="submit" class="registerbtn" onclick= "registerFunction()">Register</button>
   </div>
   
   <div class="container signin">
@@ -93,4 +93,19 @@ a {
 </form>
 
 </body>
+<script>
+  function registerFunction() {
+    var email = document.getElementById("email").value;
+    var password = document.getElementById("psw").value;
+    var name = document.getElementById("name").value;
+
+    $.getJSON('http://localhost:8082/register', { email: email, password:password, userName: name}).done(function(data) {
+      if (data == true) {
+        window.location.href = "login.html";
+      } else {
+        template = $("#template").html();
+        $('#content').html(Mustache.to_html(template, data));
+      }
+    });
+  }
 </html>

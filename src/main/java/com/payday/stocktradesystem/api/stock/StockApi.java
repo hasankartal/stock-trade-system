@@ -37,7 +37,7 @@ public class StockApi {
         for (Stock stock: firstStockList) {
             StockResponseDto stockResponseDto = new StockResponseDto();
             StockPrice price = stockManagementService.stockPrice(stock.getSymbol());
-            randomPrice = rand.nextInt(1000);
+            randomPrice = rand.nextInt(100);
             stockResponseDto.setPrice(price != null && price.getPrice() != null ? price.getPrice() : String.valueOf(randomPrice));
             stockResponseDto.setSymbol(stock.getSymbol());
 

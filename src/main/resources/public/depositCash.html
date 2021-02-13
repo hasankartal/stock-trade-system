@@ -1,77 +1,79 @@
 <!DOCTYPE html>
 <html>
 <head>
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title> Login Page </title>
-    <style>
-        Body {
-            font-family: Calibri, Helvetica, sans-serif;
-            background-color: pink;
-        }
-        button {
-            background-color: #4CAF50;
-            width: 100%;
-            color: orange;
-            padding: 15px;
-            margin: 10px 0px;
-            border: none;
-            cursor: pointer;
-        }
-        form {
-            border: 3px solid #f1f1f1;
-        }
-        input[type=text], input[type=password] {
-            width: 100%;
-            margin: 8px 0;
-            padding: 12px 20px;
-            display: inline-block;
-            border: 2px solid green;
-            box-sizing: border-box;
-        }
-        button:hover {
-            opacity: 0.7;
-        }
-        .cancelbtn {
-            width: auto;
-            padding: 10px 18px;
-            margin: 10px 5px;
-        }
-
-
-        .container {
-            padding: 25px;
-            background-color: lightblue;
-        }
-    </style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deposit Cash </title>
+<style>
+    Body {
+        font-family: Calibri, Helvetica, sans-serif;
+        background-color: pink;
+    }
+    button {
+        background-color: #4CAF50;
+        width: 100%;
+        color: orange;
+        padding: 15px;
+        margin: 10px 0px;
+        border: none;
+        cursor: pointer;
+    }
+    form {
+        border: 3px solid #f1f1f1;
+    }
+    input[type=text], input[type=password] {
+        width: 100%;
+        margin: 8px 0;
+        padding: 12px 20px;
+        display: inline-block;
+        border: 2px solid green;
+        box-sizing: border-box;
+    }
+    button:hover {
+        opacity: 0.7;
+    }
+    .container {
+        padding: 25px;
+        background-color: lightblue;
+    }
+</style>
 </head>
 <body>
-<center> <h1> Login Form </h1> </center>
+<center> <h1> Deposit Cash </h1> </center>
+
 <form >
     <div class="container">
-        <label>Email : </label>
-        <input type="text" placeholder="Enter Email" id="email" required>
-        <label>Password : </label>
-        <input type="password" placeholder="Enter Password" id="password" required>
-        <button type="submit" onclick= "loginFunction()" >Login</button>
+        <label>Cash : </label>
+        <input type="text" placeholder="Enter Cash" id="cash" required>
+        <button type="submit" onclick= "loadCashFunction()" >Load Cash</button>
+    </div>
+    <div class="container">
+        <div>
+            <button type="submit" onclick= "listStocks()" >Stocks</button>
+        </div>
+        <div>
+            <button type="submit" onclick= "placeAnOrder()" >Place An Order</button>
+        </div>
     </div>
 </form>
 <div id="content"></div>
 </body>
 
-<script id="template" type="text/x-mustache-template">
-    Hello! Email or password is wrong. {{.}}
-</script>
-
 <script>
+    function listStocks() {
+        window.location.href = "stocks.html";
+    }
 
-    function loginFunction() {
-        var email = document.getElementById("email").value;
-        var password = document.getElementById("password").value;
+    function placeAnOrder() {
+        window.location.href = "placeOrder.html";
+    }
 
-        $.getJSON('http://localhost:8082/sign-in', { email: email, password:password}).done(function(data) {
+    function loadCashFunction() {
+        var cash = document.getElementById("cash").value;
+        var userId = localStorage.getItem("user");
+
+        $.post('http://localhost:8082/loadCash', { cash: cash, userId:userId}).done(function(data) {
             if (data == true) {
                 localStorage.setItem("email", email);
                 window.location.href = "Stocks.html";
@@ -80,39 +82,7 @@
                 $('#content').html(Mustache.to_html(template, data));
             }
         });
-        /*
-        /*
-            $.post('http://localhost:8082/sign-in', { email: email, password:password},function(data) {
-                var template = $("#stock-template").html();
-                var text = Mustache.render(template, data);
-                $('#ModuleUserTable').html(text);
-            },"json" );
-
-         $.ajax({
-                type : 'GET',
-                url : 'http://localhost:8082/sign-in',
-                data : {
-                    email : email,
-                    password : password
-                },
-                success : function(data) {
-                    console.log("Hello world!");
-                },
-                error : function(jqXHR, textStatus, errorThrown) {
-                    console.log("Hello ");
-                }
-            });
-
-          $.getJSON('http://localhost:8082/sign-in', { email: email, password:password}).done(function(data) {
-                var template = $("#stock-template").html();
-                var text = Mustache.render(template, data);
-                $('#ModuleUserTable').html(text);
-            });
-
-
-        */
     }
-
 </script>
 </html>
 

@@ -68,7 +68,7 @@ public class StockManagementService {
     public void getPricesBySymbolEvent(Stock stock) {
         StockPrice price = stockPrice(stock.getSymbol());
         Random rand = new Random();
-        int randomPrice = rand.nextInt(1000);
+        int randomPrice = rand.nextInt(100);
         BigDecimal priceDecimal = new BigDecimal(price != null && price.getPrice() != null ? price.getPrice() : String.valueOf(randomPrice));
 
         buyShare(priceDecimal, stock);
