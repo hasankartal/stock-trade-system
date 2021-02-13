@@ -75,15 +75,15 @@ public class UserApi {
         return "Successful. You can sign in to platform.";
     }
 
-    @PostMapping("/sign-in")
+    @GetMapping("/sign-in")
     @ApiOperation(value="User can be sign into system.")
-    @CrossOrigin
-    public Boolean signIn(@Valid @RequestBody UserSignInDto userSignInDto)
+    public Long signIn(@RequestParam(required = false) String email, @RequestParam(required = false) String password)
     {
-        User existingUser = service.findByEmailIdAndPassword(userSignInDto.getEmail(), userSignInDto.getPassword());
+        User existingUser = service.findByEmailIdAndPassword(email, password);
         if (existingUser != null && Boolean.TRUE.equals(existingUser.isEnabled())) {
-            return true;
+            return existingUser.getUserId();
         }
-        return false;
+        long zero = 0;
+        return zero;
     }
 }

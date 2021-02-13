@@ -8,12 +8,12 @@
 <style>
     Body {
         font-family: Calibri, Helvetica, sans-serif;
-        background-color: pink;
+        background-color: #f1f1f1;
     }
     button {
         background-color: #4CAF50;
         width: 100%;
-        color: orange;
+        color: white;
         padding: 15px;
         margin: 10px 0px;
         border: none;
@@ -73,13 +73,17 @@
         var cash = document.getElementById("cash").value;
         var userId = localStorage.getItem("user");
 
-        $.post('http://localhost:8082/loadCash', { cash: cash, userId:userId}).done(function(data) {
-            if (data == true) {
-                localStorage.setItem("email", email);
-                window.location.href = "Stocks.html";
-            } else {
-                template = $("#template").html();
-                $('#content').html(Mustache.to_html(template, data));
+        var data = { cash: cash, userId: userId };
+        $.ajax({
+            url: 'http://localhost:8082/loadCash',
+            type: 'POST',
+            dataType: 'json',
+            contentType : 'application/json',
+            data: JSON.stringify(data),
+            success: function (response) {
+                window.alert("Succesful");
+            },
+            error: function (response) {
             }
         });
     }

@@ -68,7 +68,7 @@ public class StockManagementService {
     public void getPricesBySymbolEvent(Stock stock) {
         StockPrice price = stockPrice(stock.getSymbol());
         Random rand = new Random();
-        int randomPrice = rand.nextInt(100);
+        double randomPrice = rand.nextDouble() * 100;
         BigDecimal priceDecimal = new BigDecimal(price != null && price.getPrice() != null ? price.getPrice() : String.valueOf(randomPrice));
 
         buyShare(priceDecimal, stock);
@@ -96,10 +96,17 @@ public class StockManagementService {
                orderstock.setActive(false);
                orderstockService.updateOrderstock(orderstock);
 
-                SimpleMailMessage simpleMailMessage = Utils.sendEmail(existingUser.getEmail(), "STOCK SELL NOTIFICATION",
-                        "paydataassignment@gmail.com","Stock Symbol -> " + stock.getSymbol() + "/n"
+                SimpleMailMessage mailMessage = new SimpleMailMessage();
+                mailMessage.setTo(existingUser.getEmail());
+                mailMessage.setSubject("STOCK BUY NOTIFICATION ");
+                mailMessage.setFrom("paydataassignment@gmail.com");
+                mailMessage.setText("Stock Symbol -> " + stock.getSymbol() + "/n"
+                        + " Stock Price -> " + priceDecimal);
+
+                SimpleMailMessage simpleMailMessage = Utils.sendEmail(existingUser.getEmail(), "STOCK BUY NOTIFICATION",
+                        "paydataassignment@gmail.com","Stock Symbol -> " + stock.getSymbol() + " - "
                                 + " Stock Price -> " + priceDecimal);
-                emailSenderService.sendEmail(simpleMailMessage);
+                emailSenderService.sendEmail(mailMessage);
             } catch (Exception ex) {
             }
         }
@@ -125,7 +132,7 @@ public class StockManagementService {
             orderstock.setActive(false);
             orderstockService.updateOrderstock(orderstock);
 
-            SimpleMailMessage simpleMailMessage = Utils.sendEmail(existingUser.getEmail(), "STOCK BUY NOTIFICATION",
+            SimpleMailMessage simpleMailMessage = Utils.sendEmail(existingUser.getEmail(), "STOCK SELL NOTIFICATION",
                     "paydataassignment@gmail.com","Stock Symbol -> " + stock.getSymbol() + "/n"
                             + " Stock Price -> " + priceDecimal);
             emailSenderService.sendEmail(simpleMailMessage);

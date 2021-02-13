@@ -1,8 +1,8 @@
 package com.payday.stocktradesystem;
 
-
 import com.payday.stocktradesystem.domain.orderstock.Orderstock;
 import com.payday.stocktradesystem.domain.user.User;
+import com.payday.stocktradesystem.model.orderstock.OrderstockDto;
 import com.payday.stocktradesystem.repository.order.OrderstockRepository;
 import com.payday.stocktradesystem.service.orderstock.OrderstockService;
 import org.junit.jupiter.api.Assertions;
@@ -19,6 +19,15 @@ import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 public class OrderStockServiceTest {
+
+    public static final BigDecimal EXPECTED_CASH = new BigDecimal(120);
+    public static final long EXPECTED_USER_ID = 30;
+    public static final long EXPECTED_STOCK_LOT = 10;
+    public static final String EXPECTED_STOCK_SYMBOL = "ACSEL";
+    public static final String EXPECTED_ORDER_TYPE = "BUY";
+
+    private OrderstockDto orderstockDto;
+
     @InjectMocks
     OrderstockService orderstockService;
 
@@ -57,5 +66,21 @@ public class OrderStockServiceTest {
 
         Assertions.assertEquals(orderstockListTest.size(), 1);
 
+    }
+
+    @Test
+    public void setAccountDto() {
+        orderstockDto = new OrderstockDto();
+        orderstockDto.setCash(new BigDecimal(120));
+        orderstockDto.setOrderType("BUY");
+        orderstockDto.setStockLot(10);
+        orderstockDto.setUserId(30);
+        orderstockDto.setStockSymbol("ACSEL");
+
+        Assertions.assertEquals(EXPECTED_CASH, orderstockDto.getCash());
+        Assertions.assertEquals(EXPECTED_ORDER_TYPE, orderstockDto.getOrderType());
+        Assertions.assertEquals(EXPECTED_STOCK_LOT, orderstockDto.getStockLot());
+        Assertions.assertEquals(EXPECTED_USER_ID, orderstockDto.getUserId());
+        Assertions.assertEquals(EXPECTED_STOCK_SYMBOL, orderstockDto.getStockSymbol());
     }
 }

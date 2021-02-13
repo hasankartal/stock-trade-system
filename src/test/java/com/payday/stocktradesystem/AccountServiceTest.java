@@ -3,6 +3,7 @@ package com.payday.stocktradesystem;
 import com.payday.stocktradesystem.domain.account.Account;
 import com.payday.stocktradesystem.domain.user.User;
 import com.payday.stocktradesystem.model.account.AccountDto;
+import com.payday.stocktradesystem.model.user.UserDto;
 import com.payday.stocktradesystem.repository.account.AccountRepository;
 import com.payday.stocktradesystem.service.account.AccountService;
 import org.junit.jupiter.api.Assertions;
@@ -18,6 +19,11 @@ import java.math.BigDecimal;
 
 @ExtendWith(MockitoExtension.class)
 public class AccountServiceTest {
+
+    public static final BigDecimal EXPECTED_CASH = new BigDecimal(120);
+    public static final long EXPECTED_USER_ID = 30;
+
+    private AccountDto accountDto;
 
     @InjectMocks
     AccountService accountService;
@@ -52,6 +58,15 @@ public class AccountServiceTest {
         //ResponseEntity<Object> accountTest = accountService.loadCash(accountDto,user);
 
         //Assertions.assertEquals(accountTest, ResponseEntity.ok());
+    }
 
+    @Test
+    public void setAccountDto() {
+        accountDto = new AccountDto();
+        accountDto.setCash(new BigDecimal(120));
+        accountDto.setUserId(30);
+
+        Assertions.assertEquals(EXPECTED_CASH, accountDto.getCash());
+        Assertions.assertEquals(EXPECTED_USER_ID, accountDto.getUserId());
     }
 }

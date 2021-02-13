@@ -9,12 +9,12 @@
     <style>
         Body {
             font-family: Calibri, Helvetica, sans-serif;
-            background-color: pink;
+            background-color: #f1f1f1;
         }
         button {
             background-color: #4CAF50;
             width: 100%;
-            color: orange;
+            color: white;
             padding: 15px;
             margin: 10px 0px;
             border: none;
@@ -51,7 +51,7 @@
         <label>Price : </label>
         <input type="text" placeholder="Enter Price" id="price" required>
         <label>Order Type : </label>
-        <input type="text" placeholder="Enter Price" id="orderType" placeholder="BUY / SELL" required>
+        <input type="text" placeholder="BUY / SELL" id="orderType"  required>
         <button type="submit" onclick= "placeAnOrder()" >Place An Order</button>
     </div>
     <div class="container">
@@ -82,14 +82,18 @@
         var orderType = document.getElementById("orderType").value;
         var userId = localStorage.getItem("user");
 
-        $.getJSON('http://localhost:8082/orderStock', { stockSymbol: stock, stockLot:lot, cash: cash,
-            orderType: orderType,userId: userId}).done(function(data) {
-            if (data == true) {
-                window.location.href = "Stocks.html";
-
-            } else {
-                template = $("#template").html();
-                $('#content').html(Mustache.to_html(template, data));
+        var data = { stockSymbol: stockSymbol, stockLot:stockLot, cash: cash, orderType:orderType, userId:userId}
+        $.ajax({
+            url: 'http://localhost:8082/orderstock',
+            type: 'POST',
+            dataType: 'json',
+            contentType : 'application/json',
+            data: JSON.stringify(data),
+            success: function (response) {
+                window.alert("Successful");
+                console.log("Successful")
+            },
+            error: function (response) {
             }
         });
     }

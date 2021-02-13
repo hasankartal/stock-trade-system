@@ -61,11 +61,6 @@ public class UserServiceImpl implements UserService {
             return confirmationToken.getConfirmationToken();
         } catch (DataIntegrityViolationException ex) {
             throw new DataIntegrityViolationDbException("Could not register in db");
-        } catch (Exception ex) {
-            //TODO Mail Exception
-            throw new DataIntegrityViolationDbException("Could not send email");
         }
-
-
     }
 }

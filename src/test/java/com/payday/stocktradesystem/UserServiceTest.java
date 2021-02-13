@@ -2,8 +2,10 @@ package com.payday.stocktradesystem;
 
 import com.payday.stocktradesystem.domain.user.User;
 import com.payday.stocktradesystem.model.user.UserDto;
+import com.payday.stocktradesystem.model.user.UserSignInDto;
 import com.payday.stocktradesystem.repository.user.UserRepository;
 import com.payday.stocktradesystem.service.user.impl.UserServiceImpl;
+import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +16,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
+
+    public static final String EXPECTED_USER_NAME = "Hasan";
+    public static final String EXPECTED_EMAIL = "hasan.kartal@obss.com.tr";
+    public static final String EXPECTED_PASSWORD = "mugiwara";
+
+    private UserDto userDto;
+    private UserSignInDto userSignInDto;
 
     @InjectMocks
     UserServiceImpl userService;
@@ -91,4 +100,26 @@ public class UserServiceTest {
         Assertions.assertEquals(tokenTest, token);
     }
 */
+
+    @Test
+    public void userDto() {
+        userDto = new UserDto();
+        userDto.setUserName("Hasan");
+        userDto.setPassword("mugiwara");
+        userDto.setEmail("hasan.kartal@obss.com.tr");
+
+        Assertions.assertEquals(EXPECTED_USER_NAME, userDto.getUserName());
+        Assertions.assertEquals(EXPECTED_PASSWORD, userDto.getPassword());
+        Assertions.assertEquals(EXPECTED_EMAIL, userDto.getEmail());
+    }
+
+    @Test
+    public void setUserSignInDto() {
+        userSignInDto = new UserSignInDto();
+        userSignInDto.setPassword("mugiwara");
+        userSignInDto.setEmail("hasan.kartal@obss.com.tr");
+
+        Assertions.assertEquals(EXPECTED_PASSWORD, userSignInDto.getPassword());
+        Assertions.assertEquals(EXPECTED_EMAIL, userSignInDto.getEmail());
+    }
 }

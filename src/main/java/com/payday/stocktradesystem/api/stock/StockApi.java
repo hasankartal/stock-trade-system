@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -33,11 +34,11 @@ public class StockApi {
         List<Stock> firstStockList = stockLists.get(0);
 
         Random rand = new Random();
-        int randomPrice;
+        double randomPrice;
         for (Stock stock: firstStockList) {
             StockResponseDto stockResponseDto = new StockResponseDto();
             StockPrice price = stockManagementService.stockPrice(stock.getSymbol());
-            randomPrice = rand.nextInt(100);
+            randomPrice = rand.nextDouble() * 100;
             stockResponseDto.setPrice(price != null && price.getPrice() != null ? price.getPrice() : String.valueOf(randomPrice));
             stockResponseDto.setSymbol(stock.getSymbol());
 
