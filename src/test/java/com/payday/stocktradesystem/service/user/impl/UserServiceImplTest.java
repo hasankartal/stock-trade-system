@@ -1,6 +1,9 @@
 package com.payday.stocktradesystem.service.user.impl;
 
+import com.payday.stocktradesystem.domain.confirmationtoken.ConfirmationToken;
 import com.payday.stocktradesystem.domain.user.User;
+import com.payday.stocktradesystem.model.stock.StockPrice;
+import com.payday.stocktradesystem.model.user.UserDto;
 import com.payday.stocktradesystem.repository.confirmationtoken.ConfirmationTokenRepository;
 import com.payday.stocktradesystem.repository.user.UserRepository;
 import com.payday.stocktradesystem.service.confirmationToken.impl.ConfirmationTokenServiceImpl;
@@ -11,6 +14,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
+import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
@@ -86,26 +93,19 @@ class UserServiceImplTest {
 
     @Test
     void register() {
-        /*
-         confirmationTokenService = new ConfirmationTokenService(confirmationTokenRepository);
-        userService = new UserServiceImpl(userRepository, confirmationTokenService);
+        UserServiceImpl userService = new UserServiceImpl(userRepository,confirmationTokenServiceImpl);
+        UserDto userDto = new UserDto();
+        userDto.setEmail(EXPECTED_EMAIL);
+        userDto.setPassword(EXPECTED_PASSWORD);
 
-        userDto = new UserDto();
-        userDto.setEmail("hasankartal18@gmail.com");
-        userDto.setPassword("mugiwara");
-        userDto.setUserName("Hasan Kartal");
-
-        user = new User();
+        User user = new User();
+        user.setUserId(EXPECTED_USER_ID);
         user.setEmail(userDto.getEmail());
         user.setPassword(userDto.getPassword());
         user.setUserName(user.getUserName());
         user.setEnabled(false);
 
         String token = UUID.randomUUID().toString();
-        Mockito.when(userService.register(userDto)).thenReturn(token);
         String tokenTest = userService.register(userDto);
-
-        Assertions.assertNotEquals(tokenTest, token);
-         */
     }
 }

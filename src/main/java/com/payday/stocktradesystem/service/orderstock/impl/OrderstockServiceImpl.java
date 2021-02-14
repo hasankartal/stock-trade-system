@@ -54,7 +54,7 @@ public class OrderstockServiceImpl implements OrderstockService {
             BigDecimal stockLot = new BigDecimal(orderstock.getStockLot());
             BigDecimal cash = stockLot.multiply(orderstock.getCash());
 
-            if(existingAccount.getCash().compareTo(cash) == -1) {
+            if(existingAccount == null || existingAccount.getCash().compareTo(cash) == -1) {
                 throw new DataIntegrityViolationDbException("There is not enough money on your account. It is not allowed to buy stock");
             }
             return orderstockRepository.save(orderstock);

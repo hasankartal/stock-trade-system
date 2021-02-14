@@ -2,6 +2,7 @@ package com.payday.stocktradesystem.service.orderstock.impl;
 
 import com.payday.stocktradesystem.domain.orderstock.Orderstock;
 import com.payday.stocktradesystem.domain.user.User;
+import com.payday.stocktradesystem.exception.DataIntegrityViolationDbException;
 import com.payday.stocktradesystem.model.orderstock.OrderstockDto;
 import com.payday.stocktradesystem.repository.account.AccountRepository;
 import com.payday.stocktradesystem.repository.order.OrderstockRepository;
@@ -74,8 +75,10 @@ class OrderstockServiceImplTest {
         Assertions.assertEquals(orderstockTest, orderstock);
     }
 
-    @Test
-    void orderstock() {
+    @Test()
+    void orderstock() throws DataIntegrityViolationDbException{
+        accountServiceImpl = new AccountServiceImpl(accountRepository);
+        orderstockServiceImpl = new OrderstockServiceImpl(orderstockRepository,accountServiceImpl);
         OrderstockDto orderstockDto = new OrderstockDto();
         orderstockDto.setCash(EXPECTED_CASH);
         orderstockDto.setOrderType(EXPECTED_ORDER_TYPE_BUY);
@@ -88,17 +91,10 @@ class OrderstockServiceImplTest {
 
         Orderstock orderstock = new Orderstock();
         orderstock.setUser(user);
-        Mockito.when(orderstockServiceImpl.orderstock(orderstockDto,user)).thenReturn(orderstock);
-        Orderstock orderstockTest = orderstockServiceImpl.orderstock(orderstockDto,user);
+        try {
+            Mockito.when(orderstockServiceImpl.orderstock(orderstockDto, user)).thenThrow(new DataIntegrityViolationDbException("There is not enough money on your account. It is not allowed to buy stock"));
+        } catch (DataIntegrityViolationDbException ex){
 
-        Assertions.assertEquals(orderstockTest, orderstock);
+        }
     }
-
-
-/*
-    @Test
-    public void setOrderstockService() {
-
-    }
-    */
 }

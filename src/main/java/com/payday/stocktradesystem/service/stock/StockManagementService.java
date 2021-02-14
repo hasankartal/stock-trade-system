@@ -11,6 +11,7 @@ import com.payday.stocktradesystem.service.account.impl.AccountServiceImpl;
 import com.payday.stocktradesystem.service.email.EmailSenderService;
 import com.payday.stocktradesystem.service.orderstock.impl.OrderstockServiceImpl;
 import com.payday.stocktradesystem.service.user.UserService;
+import com.payday.stocktradesystem.service.user.impl.UserServiceImpl;
 import com.payday.stocktradesystem.util.Utils;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ public class StockManagementService {
     AccountServiceImpl accountServiceImpl;
 
     @Autowired
-    UserService userService;
+    UserServiceImpl userService;
 
     @Autowired
     private EmailSenderService emailSenderService;
@@ -55,9 +56,11 @@ public class StockManagementService {
     public StockPrice stockPrice(String symbol) {
         String priceUrl = "https://api.twelvedata.com/price?symbol=" + symbol + "&apikey=78c56e9dd5234edc8cb31e287ac9dd46&source=docs";
         ResponseEntity<StockPrice> priceResult = restTemplate.getForEntity(priceUrl, StockPrice.class);
-        StockPrice stockPrice = priceResult.getBody();
-
-        return stockPrice;
+        if (priceResult !=null) {
+            StockPrice stockPrice = priceResult.getBody();
+            return stockPrice;
+        }
+        return null;
     }
 
     public void getPricesBySymbolEvent(Stock stock) {
