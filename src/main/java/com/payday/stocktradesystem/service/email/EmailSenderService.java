@@ -16,7 +16,13 @@ public class EmailSenderService {
     }
 
     @Async
-    public void sendEmail(SimpleMailMessage email) {
-        javaMailSender.send(email);
+    public void sendEmail(String email, String subject, String from, String text) {
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(email);
+        mailMessage.setSubject(subject);
+        mailMessage.setFrom(from);
+        mailMessage.setText(text);
+
+        javaMailSender.send(mailMessage);
     }
 }

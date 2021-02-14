@@ -3,7 +3,7 @@ package com.payday.stocktradesystem.api.account;
 import com.payday.stocktradesystem.domain.user.User;
 import com.payday.stocktradesystem.exception.DataIntegrityViolationDbException;
 import com.payday.stocktradesystem.model.account.AccountDto;
-import com.payday.stocktradesystem.service.account.AccountService;
+import com.payday.stocktradesystem.service.account.impl.AccountServiceImpl;
 import com.payday.stocktradesystem.service.user.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -21,7 +21,7 @@ import javax.validation.Valid;
 public class AccountApi {
 
     @Autowired
-    AccountService accountService;
+    AccountServiceImpl accountServiceImpl;
 
     @Autowired
     UserService userService;
@@ -34,13 +34,12 @@ public class AccountApi {
             throw new DataIntegrityViolationDbException("Could not find active user!");
         }
 
-        ResponseEntity<Object> account;
         try{
-            account = accountService.loadCash(accountDto, existingUser);
+            accountServiceImpl.loadCash(accountDto, existingUser);
         } catch (DataIntegrityViolationException ex) {
             throw new DataIntegrityViolationDbException("Could not load money to account");
         }
 
-        return account;
+        return ResponseEntity.ok().build();
     }
 }

@@ -7,35 +7,31 @@ import com.payday.stocktradesystem.model.account.AccountDto;
 import com.payday.stocktradesystem.model.stock.Stock;
 import com.payday.stocktradesystem.model.stock.StockList;
 import com.payday.stocktradesystem.model.stock.StockPrice;
-import com.payday.stocktradesystem.service.account.AccountService;
+import com.payday.stocktradesystem.service.account.impl.AccountServiceImpl;
 import com.payday.stocktradesystem.service.email.EmailSenderService;
-import com.payday.stocktradesystem.service.orderstock.OrderstockService;
+import com.payday.stocktradesystem.service.orderstock.impl.OrderstockServiceImpl;
 import com.payday.stocktradesystem.service.user.UserService;
 import com.payday.stocktradesystem.util.Utils;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.CompletableFuture;
 
 @Service
 @AllArgsConstructor
 public class StockManagementService {
 
     @Autowired
-    OrderstockService orderstockService;
+    OrderstockServiceImpl orderstockServiceImpl;
 
     @Autowired
-    AccountService accountService;
+    AccountServiceImpl accountServiceImpl;
 
     @Autowired
     UserService userService;
@@ -45,7 +41,6 @@ public class StockManagementService {
 
     @Autowired
     private RestTemplate restTemplate;
-
 
     @Cacheable(value="cacheShareByCountry")
     public StockList findShareByCountry(String country) {
@@ -79,7 +74,7 @@ public class StockManagementService {
      * E.g. buy 100 TSLA shares with target price 200$. The order should be filled  when the price is equal or under 200$
      */
     public void buyShare(BigDecimal priceDecimal, Stock stock) {
-        List<Orderstock> orderstockBuyList = orderstockService.buyStock(stock.getSymbol(), Utils.BUY, priceDecimal);
+        List<Orderstock> orderstockBuyList = orderstockServiceImpl.buyStock(stock.getSymbol(), Utils.BUY, priceDecimal);
         for (Orderstock orderstock : orderstockBuyList) {
             AccountDto accountDto = new AccountDto();
             BigDecimal stockLot = new BigDecimal(orderstock.getStockLot());
@@ -92,21 +87,13 @@ public class StockManagementService {
             }
 
             try {
-               accountService.withdrawCash(accountDto, existingUser);
+               accountServiceImpl.withdrawCash(accountDto, existingUser);
                orderstock.setActive(false);
-               orderstockService.updateOrderstock(orderstock);
+               orderstockServiceImpl.updateOrderstock(orderstock);
 
-                SimpleMailMessage mailMessage = new SimpleMailMessage();
-                mailMessage.setTo(existingUser.getEmail());
-                mailMessage.setSubject("STOCK BUY NOTIFICATION ");
-                mailMessage.setFrom("paydataassignment@gmail.com");
-                mailMessage.setText("Stock Symbol -> " + stock.getSymbol() + "/n"
-                        + " Stock Price -> " + priceDecimal);
-
-                SimpleMailMessage simpleMailMessage = Utils.sendEmail(existingUser.getEmail(), "STOCK BUY NOTIFICATION",
+                emailSenderService.sendEmail(existingUser.getEmail(), "STOCK BUY NOTIFICATION",
                         "paydataassignment@gmail.com","Stock Symbol -> " + stock.getSymbol() + " - "
                                 + " Stock Price -> " + priceDecimal);
-                emailSenderService.sendEmail(mailMessage);
             } catch (Exception ex) {
             }
         }
@@ -116,7 +103,7 @@ public class StockManagementService {
      * Sell share for 200$, the  order will be filled when the TSLA price is equal or  more than 200$.
      */
     public void sellShare(BigDecimal priceDecimal, Stock stock) {
-        List<Orderstock> orderstockSellList = orderstockService.sellStock(stock.getSymbol(), Utils.SELL, priceDecimal);
+        List<Orderstock> orderstockSellList = orderstockServiceImpl.sellStock(stock.getSymbol(), Utils.SELL, priceDecimal);
         for (Orderstock orderstock : orderstockSellList) {
             AccountDto accountDto = new AccountDto();
             BigDecimal stockLot = new BigDecimal(orderstock.getStockLot());
@@ -128,18 +115,17 @@ public class StockManagementService {
                 throw new DataIntegrityViolationDbException("Could not find active user!");
             }
 
-            accountService.loadCash(accountDto, existingUser);
+            accountServiceImpl.loadCash(accountDto, existingUser);
             orderstock.setActive(false);
-            orderstockService.updateOrderstock(orderstock);
+            orderstockServiceImpl.updateOrderstock(orderstock);
 
-            SimpleMailMessage simpleMailMessage = Utils.sendEmail(existingUser.getEmail(), "STOCK SELL NOTIFICATION",
-                    "paydataassignment@gmail.com","Stock Symbol -> " + stock.getSymbol() + "/n"
+            emailSenderService.sendEmail(existingUser.getEmail(), "STOCK SELL NOTIFICATION",
+                    "paydataassignment@gmail.com","Stock Symbol -> " + stock.getSymbol() + " - "
                             + " Stock Price -> " + priceDecimal);
-            emailSenderService.sendEmail(simpleMailMessage);
         }
     }
 
-    //In order to performance, prices should be get asynchronously.
+    /* In order to performance, prices should be get asynchronously.
     @Async("taskExecutor")
     public CompletableFuture<List<Stock>> getPricesBySymbol(List<Stock> stockList) {
         List<Stock> stockList1 = new ArrayList<Stock>();
@@ -153,5 +139,5 @@ public class StockManagementService {
         }
         return CompletableFuture.completedFuture(stockList1);
     }
-
+    */
 }

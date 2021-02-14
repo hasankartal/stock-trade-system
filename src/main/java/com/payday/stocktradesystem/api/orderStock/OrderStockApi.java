@@ -3,7 +3,7 @@ package com.payday.stocktradesystem.api.orderStock;
 import com.payday.stocktradesystem.domain.user.User;
 import com.payday.stocktradesystem.exception.DataIntegrityViolationDbException;
 import com.payday.stocktradesystem.model.orderstock.OrderstockDto;
-import com.payday.stocktradesystem.service.orderstock.OrderstockService;
+import com.payday.stocktradesystem.service.orderstock.impl.OrderstockServiceImpl;
 import com.payday.stocktradesystem.service.user.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -21,7 +21,7 @@ import javax.validation.Valid;
 public class OrderStockApi {
 
     @Autowired
-    OrderstockService orderstockService;
+    OrderstockServiceImpl orderstockServiceImpl;
 
     @Autowired
     UserService userService;
@@ -35,7 +35,7 @@ public class OrderStockApi {
         }
 
         try{
-            orderstockService.orderstock(orderstockDto, existingUser);
+            orderstockServiceImpl.orderstock(orderstockDto, existingUser);
         } catch (DataIntegrityViolationException ex) {
             throw new DataIntegrityViolationDbException("Could not load money to account");
         }

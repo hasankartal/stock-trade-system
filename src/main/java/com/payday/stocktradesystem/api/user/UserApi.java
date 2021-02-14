@@ -4,16 +4,13 @@ import com.payday.stocktradesystem.domain.confirmationtoken.ConfirmationToken;
 import com.payday.stocktradesystem.domain.user.User;
 import com.payday.stocktradesystem.exception.DataIntegrityViolationDbException;
 import com.payday.stocktradesystem.model.user.UserDto;
-import com.payday.stocktradesystem.model.user.UserSignInDto;
-import com.payday.stocktradesystem.service.confirmationToken.ConfirmationTokenService;
+import com.payday.stocktradesystem.service.confirmationToken.impl.ConfirmationTokenServiceImpl;
 import com.payday.stocktradesystem.service.email.EmailSenderService;
 import com.payday.stocktradesystem.service.user.impl.UserServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -29,14 +26,14 @@ public class UserApi {
     private EmailSenderService emailSenderService;
 
     @Autowired
-    private ConfirmationTokenService confirmationTokenService;
+    private ConfirmationTokenServiceImpl confirmationTokenServiceImpl;
 
     @Value( "${spring.mail.username}" )
     private String username;
 
     @PostMapping("/register")
     @ApiOperation(value="Potential enterprise customer register service.")
-    public ResponseEntity<Object> register(@Valid @RequestBody UserDto userDto) {
+    public boolean register(@Valid @RequestBody UserDto userDto) {
         String register;
 
         User existingUser = service.findByEmailIdIgnoreCase(userDto.getEmail());
@@ -46,15 +43,9 @@ public class UserApi {
             try {
                 register = service.register(userDto);
 
-                SimpleMailMessage mailMessage = new SimpleMailMessage();
-                mailMessage.setTo(userDto.getEmail());
-                mailMessage.setSubject("Complete Registration!");
-                mailMessage.setFrom(username);
-                mailMessage.setText("To confirm your account, please click here : "
+                emailSenderService.sendEmail(userDto.getEmail(), "Complete Registration!", username,"To confirm your account, please click here : "
                         +"http://localhost:8082/confirm-account?token="+register);
-
-                emailSenderService.sendEmail(mailMessage);
-                return ResponseEntity.ok().build();
+                return true;
             } catch (DataIntegrityViolationDbException ex) {
                 throw new DataIntegrityViolationDbException("Could not create user");
             }
@@ -65,7 +56,7 @@ public class UserApi {
     @ApiOperation(value="Customer who received link can be active its account. Customer activation service.")
     public String confirmUserAccount(@RequestParam("token") String confirmationToken)
     {
-        ConfirmationToken token = confirmationTokenService.findByConfirmationToken(confirmationToken);
+        ConfirmationToken token = confirmationTokenServiceImpl.findByConfirmationToken(confirmationToken);
 
         if(token != null) {
             User user = service.findByEmailIdIgnoreCase(token.getUser().getEmail());
