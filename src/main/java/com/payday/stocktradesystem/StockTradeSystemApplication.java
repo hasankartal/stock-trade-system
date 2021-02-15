@@ -19,7 +19,6 @@ public class StockTradeSystemApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(StockTradeSystemApplication.class, args);
-
 	}
 
 }

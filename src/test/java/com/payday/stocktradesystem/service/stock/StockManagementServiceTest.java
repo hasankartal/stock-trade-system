@@ -7,6 +7,7 @@ import com.payday.stocktradesystem.model.stock.StockList;
 import com.payday.stocktradesystem.model.stock.StockPrice;
 import com.payday.stocktradesystem.repository.account.AccountRepository;
 import com.payday.stocktradesystem.repository.order.OrderstockRepository;
+import com.payday.stocktradesystem.repository.user.UserRepository;
 import com.payday.stocktradesystem.service.account.impl.AccountServiceImpl;
 import com.payday.stocktradesystem.service.email.EmailSenderService;
 import com.payday.stocktradesystem.service.orderstock.impl.OrderstockServiceImpl;
@@ -21,6 +22,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -31,7 +33,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-
 
 @ExtendWith(MockitoExtension.class)
 class StockManagementServiceTest {
@@ -73,6 +74,12 @@ class StockManagementServiceTest {
     @Mock
     AccountRepository accountRepository;
 
+    @Mock
+    UserRepository userRepository;
+
+    @Mock
+    Environment environment;
+
     @Test
     void findShareByCountry() {
         StockList stockList = new StockList();
@@ -103,21 +110,8 @@ class StockManagementServiceTest {
         stock.setCurrency(EXPECTED_CURRENCY);
         stock.setExchange(EXPECTED_EXCHANGE);
 
-        List<Orderstock> orderstockList = new ArrayList<>();
-        Orderstock orderstock = new Orderstock();
-        User user = new User();
-        user.setUserId(1);
-        orderstock.setUser(user);
-        orderstock.setActive(true);
-        orderstock.setStockLot(10);
-        orderstockList.add(orderstock);
+        stockManagementService = new StockManagementService(orderstockService,accountServiceImpl,userService,emailSenderService,restTemplate, environment);
 
-        stockManagementService = new StockManagementService(orderstockService,accountServiceImpl,userService,emailSenderService,restTemplate);
-/*
-        Mockito
-                .when(orderstockService.buyStock(stock.getSymbol(), Utils.BUY, new BigDecimal(1)))
-                .thenReturn(orderstockList);
-*/
         stockManagementService.getPricesBySymbolEvent(stock);
     }
 
@@ -132,7 +126,25 @@ class StockManagementServiceTest {
         stock.setCurrency(EXPECTED_CURRENCY);
         stock.setExchange(EXPECTED_EXCHANGE);
 
-        stockManagementService = new StockManagementService(orderstockService,accountServiceImpl,userService,emailSenderService,restTemplate);
+        stockManagementService = new StockManagementService(orderstockService,accountServiceImpl,userService,emailSenderService,restTemplate, environment);
+
+        List<Orderstock> orderstockList = new ArrayList<>();
+        Orderstock orderstock = new Orderstock();
+        User user = new User();
+        user.setUserId(1);
+        user.setEnabled(true);
+        orderstock.setUser(user);
+        orderstock.setActive(true);
+        orderstock.setStockLot(10);
+        orderstockList.add(orderstock);
+
+        Mockito
+                .when(orderstockService.buyStock(stock.getSymbol(), Utils.BUY, new BigDecimal(10)))
+                .thenReturn(orderstockList);
+
+        Mockito
+                .when(userService.findByUserId(1))
+                .thenReturn(user);
 
         stockManagementService.buyShare(new BigDecimal(10),stock);
     }
@@ -148,7 +160,26 @@ class StockManagementServiceTest {
         stock.setCurrency(EXPECTED_CURRENCY);
         stock.setExchange(EXPECTED_EXCHANGE);
 
-        stockManagementService = new StockManagementService(orderstockService,accountServiceImpl,userService,emailSenderService,restTemplate);
+        stockManagementService = new StockManagementService(orderstockService,accountServiceImpl,userService,emailSenderService,restTemplate, environment);
+
+        List<Orderstock> orderstockList = new ArrayList<>();
+        Orderstock orderstock = new Orderstock();
+        User user = new User();
+        user.setUserId(1);
+        user.setEnabled(true);
+        orderstock.setUser(user);
+        orderstock.setActive(true);
+        orderstock.setStockLot(10);
+        orderstockList.add(orderstock);
+
+        Mockito
+                .when(orderstockService.sellStock(stock.getSymbol(), Utils.SELL, new BigDecimal(10)))
+                .thenReturn(orderstockList);
+
+        Mockito
+                .when(userService.findByUserId(1))
+                .thenReturn(user);
+
         stockManagementService.sellShare(new BigDecimal(10),stock);
     }
 

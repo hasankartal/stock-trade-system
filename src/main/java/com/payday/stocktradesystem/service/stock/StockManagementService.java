@@ -16,6 +16,7 @@ import com.payday.stocktradesystem.util.Utils;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -42,6 +43,9 @@ public class StockManagementService {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private Environment env;
 
     @Cacheable(value="cacheShareByCountry")
     public StockList findShareByCountry(String country) {
@@ -89,16 +93,14 @@ public class StockManagementService {
                 throw new DataIntegrityViolationDbException("Could not find active user!");
             }
 
-            try {
-               accountServiceImpl.withdrawCash(accountDto, existingUser);
-               orderstock.setActive(false);
-               orderstockServiceImpl.updateOrderstock(orderstock);
+            accountServiceImpl.withdrawCash(accountDto, existingUser);
+            orderstock.setActive(false);
+            orderstockServiceImpl.updateOrderstock(orderstock);
 
-                emailSenderService.sendEmail(existingUser.getEmail(), "STOCK BUY NOTIFICATION",
-                        "paydataassignment@gmail.com","Stock Symbol -> " + stock.getSymbol() + " - "
-                                + " Stock Price -> " + priceDecimal);
-            } catch (Exception ex) {
-            }
+            String mail = env.getProperty("spring.mail.username");
+            emailSenderService.sendEmail(existingUser.getEmail(), "STOCK BUY NOTIFICATION",
+                    mail,"Stock Symbol -> " + stock.getSymbol() + " - "
+                            + " Stock Price -> " + priceDecimal);
         }
     }
 
@@ -122,8 +124,9 @@ public class StockManagementService {
             orderstock.setActive(false);
             orderstockServiceImpl.updateOrderstock(orderstock);
 
+            String mail = env.getProperty("spring.mail.username");
             emailSenderService.sendEmail(existingUser.getEmail(), "STOCK SELL NOTIFICATION",
-                    "paydataassignment@gmail.com","Stock Symbol -> " + stock.getSymbol() + " - "
+                    mail,"Stock Symbol -> " + stock.getSymbol() + " - "
                             + " Stock Price -> " + priceDecimal);
         }
     }

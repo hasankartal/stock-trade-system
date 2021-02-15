@@ -2,7 +2,7 @@ package com.payday.stocktradesystem.service.user.impl;
 
 import com.payday.stocktradesystem.domain.confirmationtoken.ConfirmationToken;
 import com.payday.stocktradesystem.domain.user.User;
-import com.payday.stocktradesystem.model.stock.StockPrice;
+import com.payday.stocktradesystem.exception.DataIntegrityViolationDbException;
 import com.payday.stocktradesystem.model.user.UserDto;
 import com.payday.stocktradesystem.repository.confirmationtoken.ConfirmationTokenRepository;
 import com.payday.stocktradesystem.repository.user.UserRepository;
@@ -14,8 +14,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 import java.util.UUID;
 
@@ -56,8 +54,8 @@ class UserServiceImplTest {
         user.setPassword(EXPECTED_PASSWORD);
         user.setEnabled(true);
 
-        Mockito.when(userService.findByUserId(1)).thenReturn(user);
-        User userTest = userService.findByUserId(1);
+        Mockito.when(userService.findByUserId(EXPECTED_USER_ID)).thenReturn(user);
+        User userTest = userService.findByUserId(EXPECTED_USER_ID);
 
         Assertions.assertEquals(userTest, user);
     }
@@ -92,7 +90,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void register() {
+    void register() throws DataIntegrityViolationDbException {
         UserServiceImpl userService = new UserServiceImpl(userRepository,confirmationTokenServiceImpl);
         UserDto userDto = new UserDto();
         userDto.setEmail(EXPECTED_EMAIL);
@@ -105,7 +103,14 @@ class UserServiceImplTest {
         user.setUserName(user.getUserName());
         user.setEnabled(false);
 
+        ConfirmationToken confirmationToken = new ConfirmationToken();
+        try {
+            Mockito.lenient().when(confirmationTokenServiceImpl.save(confirmationToken)).thenThrow(new DataIntegrityViolationDbException("Could not register in db"));
+        } catch (DataIntegrityViolationDbException ex){
+
+        }
         String token = UUID.randomUUID().toString();
         String tokenTest = userService.register(userDto);
+
     }
 }

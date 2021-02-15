@@ -3,6 +3,7 @@ package com.payday.stocktradesystem.service.account.impl;
 import com.payday.stocktradesystem.domain.account.Account;
 import com.payday.stocktradesystem.domain.user.User;
 import com.payday.stocktradesystem.model.account.AccountDto;
+import com.payday.stocktradesystem.model.stock.StockList;
 import com.payday.stocktradesystem.repository.account.AccountRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
@@ -48,6 +51,15 @@ class AccountServiceImplTest {
         Account accountTest = accountServiceImpl.loadCash(accountDto,user);
 
         Assertions.assertEquals(accountTest, account);
+
+        Mockito
+                .when(accountRepository.findByUser(user))
+                .thenReturn(account);
+
+        Mockito.when(accountServiceImpl.loadCash(accountDto,user)).thenReturn(account);
+        accountTest = accountServiceImpl.loadCash(accountDto,user);
+
+        Assertions.assertEquals(accountTest, account);
     }
 
     @Test
@@ -68,6 +80,13 @@ class AccountServiceImplTest {
         Account accountTest = accountServiceImpl.withdrawCash(accountDto,user);
 
         Assertions.assertEquals(accountTest, account);
+
+        Mockito
+                .when(accountRepository.findByUser(user))
+                .thenReturn(account);
+
+        Mockito.when(accountServiceImpl.withdrawCash(accountDto,user)).thenReturn(account);
+        accountTest = accountServiceImpl.withdrawCash(accountDto,user);
     }
 
     @Test

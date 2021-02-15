@@ -1,74 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Stocks</title>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script>
-	<!--===============================================================================================-->
-	<link rel="icon" type="image/png" href="images/icons/favicon.ico"/>
-	<!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="vendor/bootstrap/css/bootstrap.min.css">
-	<!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="fonts/font-awesome-4.7.0/css/font-awesome.min.css">
-	<!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="vendor/animate/animate.css">
-	<!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="vendor/select2/select2.min.css">
-	<!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="vendor/perfect-scrollbar/perfect-scrollbar.css">
-	<!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="css/util.css">
-	<link rel="stylesheet" type="text/css" href="css/main.css">
-	<!--===============================================================================================-->
+    <title>Stocks</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script>
+    <!--===============================================================================================-->
+    <link rel="icon" type="image/png" href="images/icons/favicon.ico"/>
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="vendor/bootstrap/css/bootstrap.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="vendor/animate/animate.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="vendor/select2/select2.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="vendor/perfect-scrollbar/perfect-scrollbar.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="css/util.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <!--===============================================================================================-->
 </head>
 <style>
-	button {
-		background-color: #4CAF50;
-		width: 100%;
-		color: white;
-		padding: 15px;
-		margin: 10px 0px;
-		border: none;
-		cursor: pointer;
-	}
-	button:hover {
-		opacity: 0.7;
-	}
+    button {
+        background-color: #4CAF50;
+        width: 100%;
+        color: white;
+        padding: 15px;
+        margin: 10px 0px;
+        border: none;
+        cursor: pointer;
+    }
+    button:hover {
+        opacity: 0.7;
+    }
 </style>
 <body>
 <center> <h1> Stocks </h1> </center>
 <div class="limiter">
-	<div class="container-table100">
-		<div class="wrap-table100">
-			<div class="table100 ver1">
-				<table>
-					<tbody>
-					</tbody>
-				</table>
+    <div class="container-table100">
+        <div class="wrap-table100">
+            <div class="table100 ver1">
+                <table>
+                    <tbody>
+                    </tbody>
+                </table>
 
-				<table >
-					<thead>
-					<tr class="row100 head">
-						<th class="cell100 column2">Stock Symbol</th>
-						<th class="cell100 column3">Price</th>
-					</tr>
-					</thead>
-					<tbody id = "ModuleUserTable">
-					<tr > </tr>
-					</tbody>
-				</table>
-			</div>
-			<div id="content"></div>
-			<div>
-				<button type="submit" onclick= "placeAnOrder()" >Place An Order</button>
-			</div>
-			<div>
-				<button type="submit" onclick= "depositCash()" >Deposit Cash</button>
-			</div>
-		</div>
-	</div>
+                <table >
+                    <thead>
+                    <tr class="row100 head">
+                        <th class="cell100 column2">Stock Symbol</th>
+                        <th class="cell100 column3">Price</th>
+                    </tr>
+                    </thead>
+                    <tbody id = "ModuleUserTable">
+                    <tr > </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div id="content"></div>
+            <div>
+                <button type="submit" onclick= "placeAnOrder()" >Place An Order</button>
+            </div>
+            <div>
+                <button type="submit" onclick= "depositCash()" >Deposit Cash</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 
@@ -83,48 +83,48 @@
 <script src="vendor/perfect-scrollbar/perfect-scrollbar.min.js"></script>
 
 <script id="stock-template" type="text/template">
-	{{#.}}
-	<tr class="row100 head">
-		<td class="cell100 column2">{{symbol}}</td>
-		<td class="cell100 column3">{{price}}</td>
-	</tr>
-	{{/.}}
+    {{#.}}
+    <tr class="row100 head">
+        <td class="cell100 column2">{{symbol}}</td>
+        <td class="cell100 column3">{{price}}</td>
+    </tr>
+    {{/.}}
 </script>
 
 <script>
-	function placeAnOrder() {
-		window.location.href = "placeOrder.html";
-	}
-	function depositCash() {
-		window.location.href = "depositCash.html";
-	}
+    function placeAnOrder() {
+        window.location.href = "placeOrder.html";
+    }
+    function depositCash() {
+        window.location.href = "depositCash.html";
+    }
 
-	$(document).ready(function() {
-		$.getJSON('http://localhost:8082/stock', function(data) {
-			var template = $("#stock-template").html();
-			var text = Mustache.render(template, data);
-			$('#ModuleUserTable').html(text);
-		});
-	});
+    $(document).ready(function() {
+        $.getJSON('http://localhost:8082/stock', function(data) {
+            var template = $("#stock-template").html();
+            var text = Mustache.render(template, data);
+            $('#ModuleUserTable').html(text);
+        });
+    });
 </script>
 
 <script>
-	$('.js-pscroll').each(function(){
-		var ps = new PerfectScrollbar(this);
+    $('.js-pscroll').each(function(){
+        var ps = new PerfectScrollbar(this);
 
-		$(window).on('resize', function(){
-			ps.update();
-		})
+        $(window).on('resize', function(){
+            ps.update();
+        })
 
-		$(this).on('ps-x-reach-start', function(){
-			$(this).parent().find('.table100-firstcol').removeClass('shadow-table100-firstcol');
-		});
+        $(this).on('ps-x-reach-start', function(){
+            $(this).parent().find('.table100-firstcol').removeClass('shadow-table100-firstcol');
+        });
 
-		$(this).on('ps-scroll-x', function(){
-			$(this).parent().find('.table100-firstcol').addClass('shadow-table100-firstcol');
-		});
+        $(this).on('ps-scroll-x', function(){
+            $(this).parent().find('.table100-firstcol').addClass('shadow-table100-firstcol');
+        });
 
-	});
+    });
 </script>
 
 <!--===============================================================================================-->

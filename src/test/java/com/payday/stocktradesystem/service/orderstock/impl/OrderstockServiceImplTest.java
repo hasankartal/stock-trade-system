@@ -75,8 +75,8 @@ class OrderstockServiceImplTest {
         Assertions.assertEquals(orderstockTest, orderstock);
     }
 
-    @Test()
-    void orderstock() throws DataIntegrityViolationDbException{
+    @Test
+    void orderstock() throws DataIntegrityViolationDbException {
         accountServiceImpl = new AccountServiceImpl(accountRepository);
         orderstockServiceImpl = new OrderstockServiceImpl(orderstockRepository,accountServiceImpl);
         OrderstockDto orderstockDto = new OrderstockDto();
@@ -96,5 +96,12 @@ class OrderstockServiceImplTest {
         } catch (DataIntegrityViolationDbException ex){
 
         }
+
+        try {
+            Mockito.lenient().when(orderstockRepository.save(orderstock)).thenThrow(new DataIntegrityViolationDbException("Could not register in db"));
+        } catch (DataIntegrityViolationDbException ex){
+
+        }
+
     }
 }

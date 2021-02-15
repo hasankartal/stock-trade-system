@@ -30,6 +30,6 @@ public interface OrderstockRepository extends JpaRepository<Orderstock,Long> {
                     " and e.active = true"
     )
     List<Orderstock> findByStockSymbolEqualsAndOrderTypeEqualsAndCashIsGreatThanAbove(@Param("symbol") String symbol,
-                                                                                     @Param("orderType") String orderType,
-                                                                                     @Param("cash") BigDecimal cash);
+                                                                                      @Param("orderType") String orderType,
+                                                                                      @Param("cash") BigDecimal cash);
 }

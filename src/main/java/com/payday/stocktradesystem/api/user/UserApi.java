@@ -4,6 +4,7 @@ import com.payday.stocktradesystem.domain.confirmationtoken.ConfirmationToken;
 import com.payday.stocktradesystem.domain.user.User;
 import com.payday.stocktradesystem.exception.DataIntegrityViolationDbException;
 import com.payday.stocktradesystem.model.user.UserDto;
+import com.payday.stocktradesystem.model.user.UserSignInDto;
 import com.payday.stocktradesystem.service.confirmationToken.impl.ConfirmationTokenServiceImpl;
 import com.payday.stocktradesystem.service.email.EmailSenderService;
 import com.payday.stocktradesystem.service.user.impl.UserServiceImpl;
@@ -40,37 +41,34 @@ public class UserApi {
         if (existingUser != null) {
             throw new DataIntegrityViolationDbException("This email already exists!");
         } else {
-            try {
-                register = service.register(userDto);
+            register = service.register(userDto);
 
-                emailSenderService.sendEmail(userDto.getEmail(), "Complete Registration!", username,"To confirm your account, please click here : "
-                        +"http://localhost:8082/confirm-account?token="+register);
-                return true;
-            } catch (DataIntegrityViolationDbException ex) {
-                throw new DataIntegrityViolationDbException("Could not create user");
-            }
+            emailSenderService.sendEmail(userDto.getEmail(), "Complete Registration!", username,"To confirm your account, please click here : "
+                    +"http://localhost:8082/confirm-account?token="+register);
+            return true;
         }
     }
 
     @GetMapping("/confirm-account")
     @ApiOperation(value="Customer who received link can be active its account. Customer activation service.")
-    public String confirmUserAccount(@RequestParam("token") String confirmationToken)
+    public String confirmUserAccount(@RequestParam(required = true) String token)
     {
-        ConfirmationToken token = confirmationTokenServiceImpl.findByConfirmationToken(confirmationToken);
+        ConfirmationToken confirmationToken = confirmationTokenServiceImpl.findByConfirmationToken(token);
 
         if(token != null) {
-            User user = service.findByEmailIdIgnoreCase(token.getUser().getEmail());
+            User user = service.findByEmailIdIgnoreCase(confirmationToken.getUser().getEmail());
             user.setEnabled(true);
             service.updateUser(user);
+            return "Successful. You can sign in to platform.";
         }
-        return "Successful. You can sign in to platform.";
+        return "Unsuccessful";
     }
 
-    @GetMapping("/sign-in")
+    @PostMapping("/sign-in")
     @ApiOperation(value="User can be sign into system.")
-    public Long signIn(@RequestParam(required = false) String email, @RequestParam(required = false) String password)
+    public Long signIn(@Valid @RequestBody UserSignInDto userSignInDto)
     {
-        User existingUser = service.findByEmailIdAndPassword(email, password);
+        User existingUser = service.findByEmailIdAndPassword(userSignInDto.getEmail(), userSignInDto.getPassword());
         if (existingUser != null && Boolean.TRUE.equals(existingUser.isEnabled())) {
             return existingUser.getUserId();
         }
