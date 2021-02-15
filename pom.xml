@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.payday</groupId>
-	<artifactId>stock-trade</artifactId>
+	<artifactId>stock-trade-system</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>stock-trade</name>
+	<name>stock-trade-system</name>
 	<description>Stock Trade System</description>
 	<properties>
 		<java.version>11</java.version>
