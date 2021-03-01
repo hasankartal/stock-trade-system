@@ -11,9 +11,9 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 @ExtendWith(MockitoExtension.class)
 class EmailSenderServiceTest {
-    private static final String toMail = "hasankartal18@gmail.com";
+    private static final String toMail = "test@gmail.com";
     private static final String subject = "TEST";
-    private static final String fromMail = "hasan.kartal@obss.com";
+    private static final String fromMail = "test@gmail.com";
     private static final String text = "TEST Text";
 
     @InjectMocks

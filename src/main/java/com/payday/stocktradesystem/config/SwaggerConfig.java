@@ -18,7 +18,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 public class SwaggerConfig {
 
     public static final Contact DEFAULT_CONTACT = new Contact(
-            "Hasan Kartal", "http://www.payday.com", "hasankartal18@gmail.com");
+            "Hasan Kartal", "http://www.payday.com", "test@gmail.com");
 
     public static final ApiInfo DEFAULT_API_INFO = new ApiInfo(
             "Stock Trade System", "Backend service application for stock trade system", "1.0",

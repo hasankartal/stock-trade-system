@@ -14,7 +14,7 @@ class SwaggerConfigTest {
 
     @Test
     void contactTest() {
-        Contact DEFAULT_CONTACT = new Contact("Hasan Kartal", "http://www.payday.com", "hasankartal18@gmail.com");
+        Contact DEFAULT_CONTACT = new Contact("Hasan Kartal", "http://www.payday.com", "test@gmail.com");
 
         Assertions.assertEquals(DEFAULT_CONTACT.getName(), SwaggerConfig.DEFAULT_CONTACT.getName());
         Assertions.assertEquals(DEFAULT_CONTACT.getEmail(), SwaggerConfig.DEFAULT_CONTACT.getEmail());
