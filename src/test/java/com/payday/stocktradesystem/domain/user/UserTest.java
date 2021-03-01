@@ -7,7 +7,7 @@ class UserTest {
     private static final long EXPECTED_USER_ID = 58;
     private static final String EXPECTED_USER_NAME = "Hasan";
     private static final String EXPECTED_EMAIL = "hasan.kartal@obss.com.tr";
-    private static final String EXPECTED_PASSWORD = "mugiwara";
+    private static final String EXPECTED_PASSWORD = "testPassword";
     private static final Boolean EXPECTED_ENABLED = true;
     private User user;
 

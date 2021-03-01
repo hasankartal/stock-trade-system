@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserDtoTest {
     private static final String EXPECTED_USER_NAME = "Hasan";
     private static final String EXPECTED_EMAIL = "hasan.kartal@obss.com.tr";
-    private static final String EXPECTED_PASSWORD = "mugiwara";
+    private static final String EXPECTED_PASSWORD = "testPassword";
     private UserDto userDto;
 
     @Test
@@ -21,7 +21,7 @@ class UserDtoTest {
     @Test
     void getPassword() {
         userDto = new UserDto();
-        userDto.setPassword("mugiwara");
+        userDto.setPassword("testPassword");
         Assertions.assertEquals(EXPECTED_PASSWORD, userDto.getPassword());
     }
 

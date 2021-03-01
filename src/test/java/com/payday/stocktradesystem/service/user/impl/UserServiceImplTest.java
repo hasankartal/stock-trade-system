@@ -20,7 +20,7 @@ import java.util.UUID;
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
     private static final String EXPECTED_EMAIL = "hasan.kartal@obss.com.tr";
-    private static final String EXPECTED_PASSWORD = "mugiwara";
+    private static final String EXPECTED_PASSWORD = "testPassword";
     private static final long EXPECTED_USER_ID = 1;
 
     @InjectMocks
