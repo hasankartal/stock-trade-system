@@ -8,17 +8,16 @@ import java.util.concurrent.Executor;
 
 @Configuration
 @EnableAsync
-public class AsyncConfiguration {
-    /*
-    @Bean (name = "taskExecutor")
+public class ThreadConfig {
+
+    @Bean (name = "stockOrder")
     public Executor taskExecutor() {
         final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(2);
-        executor.setMaxPoolSize(2);
-        executor.setQueueCapacity(1000);
-        executor.setThreadNamePrefix("Stock - Thread");
+        executor.setCorePoolSize(10);
+        executor.setMaxPoolSize(50);
+//        executor.setQueueCapacity(1000);
+        executor.setThreadNamePrefix("stockOrder");
         executor.initialize();
         return executor;
     }
-    */
 }

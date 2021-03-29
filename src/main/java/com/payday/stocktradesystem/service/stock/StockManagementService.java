@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -67,6 +68,7 @@ public class StockManagementService {
         return null;
     }
 
+    @Async("stockOrder")
     public void getPricesBySymbolEvent(Stock stock) {
         StockPrice price = stockPrice(stock.getSymbol());
         Random rand = new Random();
